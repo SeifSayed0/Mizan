@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 async function querySupabase(path: string, options: RequestInit = {}) {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
@@ -28,7 +26,7 @@ async function querySupabase(path: string, options: RequestInit = {}) {
   return response.json();
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   const { method, url = '' } = req;
 
   // Set CORS headers
