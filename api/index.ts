@@ -156,7 +156,7 @@ export default async function handler(req: any, res: any) {
         });
       }
 
-      const rows = await querySupabase('decisions?select=*&order=created_at.desc&limit=50');
+      const rows = await querySupabase('decisions?select=*,votes(count),experiences(count)&order=created_at.desc&limit=50');
       const mapped = (rows || []).map((row: any) => ({
         id: row.id,
         guestId: row.guest_id || row.guestId || '',
@@ -169,8 +169,8 @@ export default async function handler(req: any, res: any) {
         status: row.status ?? 'published',
         createdAt: row.created_at || row.createdAt,
         updatedAt: row.updated_at || row.updatedAt,
-        votes: row.votes_count ?? 0,
-        experiences: row.experiences_count ?? 0
+        votes: row.votes?.[0]?.count ?? 0,
+        experiences: row.experiences?.[0]?.count ?? 0
       }));
       return res.status(200).json(mapped);
     }
