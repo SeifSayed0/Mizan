@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import { registerMizanRoutes } from './mizanRoutes';
 
 dotenv.config();
 
@@ -16,5 +17,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.get('/api', (req: Request, res: Response) => {
   res.status(200).json({ message: 'Mizan API is running!' });
 });
+
+// Register Mizan Endpoints (/api/mizan/*)
+registerMizanRoutes(app);
 
 export default app;
