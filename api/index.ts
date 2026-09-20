@@ -53,7 +53,7 @@ export default async function handler(req: any, res: any) {
     // 3. Post Vote
     if (url.includes('/api/mizan/votes') && method === 'POST') {
       const { decisionId, guestId, choice, experienceRelation } = req.body || {};
-      const payload: Record<string, any> = { choice: choice || 'optionA' };
+      const payload: Record<string, any> = { choice: choice === 'optionA' ? 'a' : choice === 'optionB' ? 'b' : choice };
       if (decisionId) payload.decision_id = decisionId;
       if (guestId) payload.guest_id = guestId;
       if (experienceRelation) payload.experience_relation = experienceRelation;
