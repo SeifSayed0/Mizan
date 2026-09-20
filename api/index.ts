@@ -88,7 +88,7 @@ export default async function handler(req: any, res: any) {
     }
 
     // 5. Get All / Single Decision
-    if (url.includes('/api/mizan/decisions') && method === 'GET') {
+    if (url.includes('/api/mizan/decisions')) {
       const match = url.match(/\/api\/mizan\/decisions\/([^\/\?]+)/);
       if (match) {
         const id = match[1];
@@ -149,7 +149,11 @@ export default async function handler(req: any, res: any) {
 
     return res.status(404).json({ error: 'Endpoint not found' });
   } catch (err: any) {
-    console.error('[API Error]', err);
-    return res.status(500).json({ error: 'Internal Server Error', details: err?.message });
+    console.error('[API Error Details]:', err);
+    return res.status(200).json({ 
+      error: 'Internal Handled Error', 
+      message: err?.message || String(err),
+      stack: err?.stack || null
+    });
   }
 }
