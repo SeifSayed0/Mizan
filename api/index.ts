@@ -169,7 +169,7 @@ export default async function handler(req: any, res: any) {
         status: row.status ?? 'published',
         createdAt: row.created_at || row.createdAt,
         updatedAt: row.updated_at || row.updatedAt,
-        votes: row.votes_count ?? 1,
+        votes: row.votes_count ?? 0,
         experiences: row.experiences_count ?? 0
       }));
       return res.status(200).json(mapped);
