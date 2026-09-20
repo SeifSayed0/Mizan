@@ -83,8 +83,26 @@ export default async function handler(req: any, res: any) {
         method: 'POST',
         body: JSON.stringify(payload)
       });
-      const result = Array.isArray(inserted) ? inserted[0] : inserted;
-      return res.status(201).json(result || { success: true });
+      
+      const item = Array.isArray(inserted) ? inserted[0] : inserted;
+      
+      // Map returned created decision keys for Frontend expectation
+      const responsePayload = {
+        id: item?.id,
+        guestId: item?.guest_id || guestId || '',
+        title: item?.title || title,
+        description: item?.description || description || '',
+        category: item?.category || category || 'عام',
+        privacy: item?.privacy || privacy || 'public',
+        optionA: item?.option_a || optionA || 'الخيار الأول',
+        optionB: item?.option_b || optionB || 'الخيار الثاني',
+        status: item?.status || 'published',
+        createdAt: item?.created_at || new Date().toISOString(),
+        votes: 0,
+        experiences: 0
+      };
+
+      return res.status(201).json(responsePayload);
     }
 
     // 5. Get All / Single Decision
@@ -98,7 +116,16 @@ export default async function handler(req: any, res: any) {
         }
         const d = rows[0];
         let exps: any[] = [];
-        try { exps = await querySupabase(`experiences?select=*&decision_id=eq.${id}`); } catch (_) {}
+        let votesCount = 0;
+        
+        try { 
+          exps = await querySupabase(`experiences?select=*&decision_id=eq.${id}`);
+        } catch (_) {}
+
+        try {
+          const v = await querySupabase(`votes?select=id&decision_id=eq.${id}`);
+          votesCount = v?.length ?? 0;
+        } catch (_) {}
 
         return res.status(200).json({
           id: d.id,
@@ -111,6 +138,7 @@ export default async function handler(req: any, res: any) {
           optionB: d.option_b || d.optionB || 'الخيار الثاني',
           status: d.status ?? 'published',
           createdAt: d.created_at || d.createdAt,
+          votes: votesCount,
           experiences: (exps || []).map((e: any) => ({
             id: e.id,
             decisionId: e.decision_id || e.decisionId,
@@ -141,7 +169,7 @@ export default async function handler(req: any, res: any) {
         status: row.status ?? 'published',
         createdAt: row.created_at || row.createdAt,
         updatedAt: row.updated_at || row.updatedAt,
-        votes: row.votes_count ?? 0,
+        votes: row.votes_count ?? 1,
         experiences: row.experiences_count ?? 0
       }));
       return res.status(200).json(mapped);
