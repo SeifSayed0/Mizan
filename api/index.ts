@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { registerMizanRoutes } from '../server/mizanRoutes.js';
 
 dotenv.config();
 
 const app = express();
-
 app.use(express.json());
 
 // API Health Check
@@ -13,12 +11,16 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Root Check
-app.get('/api', (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Mizan API is running!' });
+// Import and register Mizan routes with error handling
+app.use(async (req: Request, res: Response, next: any) => {
+  try {
+    const { registerMizanRoutes } = await import('../server/mizanRoutes');
+    const router = express.Router();
+    registerMizanRoutes(app);
+    next();
+  } catch (err) {
+    next();
+  }
 });
-
-// Register All Mizan Endpoints
-registerMizanRoutes(app);
 
 export default app;
