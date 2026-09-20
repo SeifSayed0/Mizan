@@ -1,17 +1,20 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 
 // API Health Check
-app.get('/api/health', (req: any, res: any) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Fallback for root API
-app.get('/api', (req: any, res: any) => {
-  res.json({ message: 'Mizan API is running' });
+// API Root Check
+app.get('/api', (req: Request, res: Response) => {
+  res.status(200).json({ message: 'Mizan API is running!' });
 });
 
 export default app;
