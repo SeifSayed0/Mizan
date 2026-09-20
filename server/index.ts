@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { registerMizanRoutes } from './mizanRoutes';
 
 dotenv.config();
 
@@ -13,12 +12,20 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Root Check
-app.get('/api', (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Mizan API is running!' });
+// Safe Mizan Routes Loader
+app.get('/api/mizan/decisions', async (req: Request, res: Response) => {
+  try {
+    const { registerMizanRoutes } = await import('./mizanRoutes');
+    // إذا نجح الاستدعاء
+    res.status(200).json({ message: "Routes module loaded successfully" });
+  } catch (err: any) {
+    // طباعة تفاصيل الخطأ بدلاً من الانهيار
+    res.status(500).json({ 
+      error: "Failed to load mizanRoutes", 
+      details: err?.message || String(err),
+      stack: err?.stack
+    });
+  }
 });
-
-// Register Mizan Endpoints (/api/mizan/*)
-registerMizanRoutes(app);
 
 export default app;
